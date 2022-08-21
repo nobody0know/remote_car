@@ -17,8 +17,8 @@
 #include "mqtt.h"
 
 PID_TypeDef motor_pid;
-
-esp_err_t chassis_init(chassis *car_chassis)
+chassis car_chassis[4];
+esp_err_t chassis_init()
 {
     ESP_ERROR_CHECK(can_init());
     pid_param_init(&motor_pid,
@@ -31,7 +31,6 @@ esp_err_t chassis_init(chassis *car_chassis)
                     CHASSIS_PID_I,
                     CHASSIS_PID_D);
     static TaskHandle_t chassis_handle;
-    ESP_ERROR_CHECK();
     if(pdPASS == xTaskCreate(chassis_task,"chassis",4096,NULL,FB_UPDATE_PRIO,&chassis_handle)){
         return ESP_OK;
     }
@@ -39,21 +38,15 @@ esp_err_t chassis_init(chassis *car_chassis)
     return ESP_FAIL;
 }
 
-void chassis_task(void)
+void chassis_task(void* n)
 {
     while(1){
-        if(car_chassis.gear==1){
-        float car_forward = chassis.accel+chassis.brake;
-        if(car_forward<=0)
-        car_forward=0;
-        chassis.give_current = car_forward*FORWARD_RATE;
-        }
-        else if(car_chassis.gear==-1){
-        float car_back = chassis.accel+chassis.brake;
-        if(car_back<=0)
-        car_back=0;
-        chassis.give_current = -car_back*BACK_RATE;
-        }
-        vTaskDelay(100);
+        car_chassis[0].give_current = (acc_message+bre_message)*0.8*FORWARD_RATE-tur_message*200;
+        car_chassis[1].give_current = (acc_message+bre_message)*1.2*FORWARD_RATE+tur_message*200;
+        car_chassis[2].give_current = (acc_message+bre_message)*1.2*FORWARD_RATE+tur_message*200;
+        car_chassis[3].give_current = (acc_message+bre_message)*0.8*FORWARD_RATE-tur_message*200;
+        printf("set = %d\n",(acc_message+bre_message)*FORWARD_RATE);
+        set_moto_current(-car_chassis[0].give_current,car_chassis[1].give_current,car_chassis[2].give_current,-car_chassis[3].give_current);
+        vTaskDelay(20);
     }
 }

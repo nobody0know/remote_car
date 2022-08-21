@@ -3,7 +3,7 @@
 #include "freertos/task.h"
 #include "freertos/semphr.h"
 #include "can.h"
-
+#include "chassis_control.h"
 
 static const twai_timing_config_t t_config = TWAI_TIMING_CONFIG_1MBITS();
 

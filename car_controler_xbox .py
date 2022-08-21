@@ -48,7 +48,7 @@ class MqttRoad(object):
         client.subscribe("accelerator")
         client.subscribe("turn")
         client.subscribe("brake")
-        client.subscribe("mode")
+        client.subscribe("gearmode")
  
  
     def on_message(self, client, userdata, msg):
@@ -157,7 +157,7 @@ while done==False:
             #if i==1 and (axis<-0.1 or axis>0.1):
                 #print("Left ↑ ↓",-axis)
                 #client.publish(topic="vx",payload=axis,qos=0,retain=False)
-            if i==0 and (axis<-0.1 or axis>0.1) :
+            if i==0:
                 print("Left ← →",-axis)
                 client.publish(topic="turn",payload=axis,qos=0,retain=False)
             if i==3 and axis < -0.1:
@@ -168,14 +168,14 @@ while done==False:
                 print("Right left",axis)
             if i==2 and axis > 0.1:
                 print("Right right",axis)
-            if i==4 and axis > -0.9:
+            if i==4 :
                 axis+=1
                 print("brake",axis)
-                client.publish(topic="brake",payload=axis,qos=0,retain=False)
-            if i==5 and axis > -0.9:
+                client.publish(topic="brake",payload=-axis*1.3,qos=0,retain=False)
+            if i==5 :
                 axis+=1
                 print("accelerator",axis)
-                client.publish(topic="accelerator",payload=axis,qos=0,retain=False)
+                client.publish(topic="accelerator",payload=-axis*1.3,qos=0,retain=False)
        
         textPrint.unindent()
             
@@ -226,10 +226,10 @@ while done==False:
                 print("FX left")
             if hat==(0,1):
                 print("FX up")
-                client.publish(topic="mode",payload=-1,qos=2,retain=False)
+                client.publish(topic="gearmode",payload=-1,qos=2,retain=False)
             if hat==(0,-1):
                 print("FX down")
-                client.publish(topic="mode",payload=1,qos=2,retain=False)
+                client.publish(topic="gearmode",payload=1,qos=2,retain=False)
 
         textPrint.unindent()
         

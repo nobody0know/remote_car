@@ -103,15 +103,15 @@ float pid_calc(PID_TypeDef *pid, float get, float set)
     pid->target = set;
     pid->err = set - get;
 
-    pid->pout = pid->p * pid->err;
-    pid->iout += pid->i * pid->err;
-    pid->dout = pid->d * (pid->err - pid->last_err);
+    pid->pout = pid->kp* pid->err;
+    pid->iout += pid->ki * pid->err;
+    pid->dout = pid->kd * (pid->err - pid->last_err);
 
-    abs_limit(&(pid->iout), pid->integral_limit);
-    pid->out = pid->pout + pid->iout + pid->dout;
-    abs_limit(&(pid->out), pid->max_output);
+    abs_limit(&(pid->iout), pid->IntegralLimit);
+    pid->output = pid->pout + pid->iout + pid->dout;
+    abs_limit(&(pid->output), pid->MaxOutput);
 
     pid->last_err  = pid->err;
 
-    return pid->out;
+    return pid->output;
 }

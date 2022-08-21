@@ -11,5 +11,5 @@
     "target/esp32.cfg"
   ],
   "idf.flashType": "UART",
-  "idf.portWin": "COM6"
+  "idf.portWin": "COM3"
 }

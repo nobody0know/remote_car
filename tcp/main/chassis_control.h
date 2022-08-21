@@ -8,7 +8,8 @@
  * 
  * Copyright (c) 2022 by nobody0know 61100216+nobody0know@users.noreply.github.com, All Rights Reserved. 
  */
-
+#include "stdint.h"
+#include "esp_err.h"
 #define CAR_CONTROL_MODE 1//1为油门刹车的开环模式，0为pid控制的闭环模式
 
 #define CHASSIS_PID_P 6.0f
@@ -21,8 +22,8 @@
 #define CHASSIS_PID_FIRST_TARGET 0
 #define ACCELERATE_RATE 2000
 #define BRAKE_RATE 100
-#define FORWARD_RATE 2000
-#define BACK_RATE 500
+#define FORWARD_RATE 300
+#define BACK_RATE 300
 typedef struct
 {
     int8_t gear;
@@ -37,5 +38,7 @@ typedef struct
     int16_t give_current;
 }chassis;
 
-chassis car_chassis;
-extern chassis car_chassis;
+
+extern chassis car_chassis[4];
+void chassis_task(void* n);
+esp_err_t chassis_init();

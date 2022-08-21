@@ -5,9 +5,9 @@
 #include "esp_err.h"
 #include "driver/twai.h"
 
-#define TX_GPIO_NUM 13
-#define RX_GPIO_NUM 15
-#define MOTO_NUM 1
+#define TX_GPIO_NUM 22
+#define RX_GPIO_NUM 23
+#define MOTO_NUM 4
 #define FB_UPDATE_PRIO 10
 
 typedef struct{

@@ -30,6 +30,9 @@
 char control_data_receive[10];
 float  control_data;
 char car_topic[20];
+int16_t acc_message=0;
+int16_t bre_message=0;
+int16_t tur_message=0;
 
 static const char *TAG = "ESP32";
 static void log_error_if_nonzero(const char *message, int error_code)
@@ -85,8 +88,6 @@ static void mqtt_event_handler(void *handler_args, esp_event_base_t base, int32_
         ESP_LOGI(TAG, "sent subscribe successful, msg_id=%d", msg_id[1]);
         msg_id[2] = esp_mqtt_client_subscribe(client, "turn", 2);
         ESP_LOGI(TAG, "sent subscribe successful, msg_id=%d", msg_id[2]);
-        msg_id[3] = esp_mqtt_client_subscribe(client, "mode", 2);
-        ESP_LOGI(TAG, "sent subscribe successful, msg_id=%d", msg_id[3]);
         break;
     case MQTT_EVENT_DISCONNECTED:
         ESP_LOGI(TAG, "MQTT_EVENT_DISCONNECTED");
@@ -99,8 +100,6 @@ static void mqtt_event_handler(void *handler_args, esp_event_base_t base, int32_
         ESP_LOGI(TAG, "sent publish successful, msg_id=%d", msg_id[1]);
         msg_id[2] = esp_mqtt_client_publish(client, "turn", "start2", 0, 2, 0);//全部的开关
         ESP_LOGI(TAG, "sent publish successful, msg_id=%d", msg_id[2]);
-        msg_id[3] = esp_mqtt_client_publish(client, "mode", "start3", 0, 2, 0);//全部的开关
-        ESP_LOGI(TAG, "sent publish successful, msg_id=%d", msg_id[3]);
         break;
     case MQTT_EVENT_UNSUBSCRIBED:
         ESP_LOGI(TAG, "MQTT_EVENT_UNSUBSCRIBED, msg_id=%d", event->msg_id);
@@ -125,21 +124,15 @@ static void mqtt_event_handler(void *handler_args, esp_event_base_t base, int32_
         printf("DATA_TSM = %f\r\n",control_data);
         if(my_strcmp(car_topic,"brake"))
         {
-            car_chassis.vx_set = control_data;//pid控制
-            car_chassis.accel = control_data;//油门控制
+            bre_message = control_data;
         }
         else if(my_strcmp(car_topic,"accelerator"))
         {
-           car_chassis.vx_set = -control_data; //pid控制
-           car_chassis.brake = -control_data;//刹车控制
+           acc_message = -control_data;//刹车控制
         }
         else if(my_strcmp(car_topic,"turn"))
         {
-            car_chassis.vy_set = control_data;//转向控制
-        }
-        else if(my_strcmp(car_topic,"mode"))
-        {
-            car_chassis.gear = (int)control_data;
+            tur_message = control_data;//转向控制
         }
         memset(control_data_receive,'\0',sizeof(control_data_receive)); 
         memset(car_topic,'\0',sizeof(car_topic)); 

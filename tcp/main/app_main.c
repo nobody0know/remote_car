@@ -34,6 +34,7 @@
 #include "pid.h"
 #include "mqtt.h"
 #include "pwm.h"
+#include "chassis_control.h"
 
 #define GPIO_INPUT_PIN_SEL 1ULL<<13
 
@@ -57,14 +58,26 @@ void app_main(void)
     ESP_ERROR_CHECK(esp_event_loop_create_default());
     servo_control_init();
 
+    //    ESP_ERROR_CHECK(can_init());
     /* This helper function configures Wi-Fi or Ethernet, as selected in menuconfig.
      * Read "Establishing Wi-Fi or Ethernet Connection" section in
      * examples/protocols/README.md for more information about this function.
      */
-    ESP_ERROR_CHECK(example_connect())
+    ESP_ERROR_CHECK(example_connect());
     mqtt_app_start();
+    ESP_ERROR_CHECK(chassis_init());
+    // uint32_t reflash_time=0;
+    // reflash_time = xTaskGetTickCount();
     while (1)
     {
+        // if (xTaskGetTickCount() - reflash_time > 200/portTICK_PERIOD_MS)
+        // {
+        //     //digit_massage = 0;
+        //     reflash_time = xTaskGetTickCount();
+        //     printf("get = %d\n",moto_chassis->speed_rpm);
+        // }
+        
+        // vTaskDelay(10/portTICK_RATE_MS);
         vTaskDelay(1000 / portTICK_PERIOD_MS);
     }
     
