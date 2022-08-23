@@ -45,11 +45,11 @@ class MqttRoad(object):
     def on_connect(self, client, userdata, flags, rc):
         print("Connected with result code: " + str(rc))
         # 订阅
-        client.subscribe("accelerator")
-        client.subscribe("turn")
-        client.subscribe("brake")
-        client.subscribe("gearmode")
- 
+        #client.subscribe("accelerator")
+        #client.subscribe("brake")
+        client.subscribe("vx")
+        client.subscribe("vy")
+        client.subscribe("wz")
  
     def on_message(self, client, userdata, msg):
         print("on_message topic:" + msg.topic + " message:" + str(msg.payload.decode('utf-8')))
@@ -150,32 +150,32 @@ while done==False:
         axes = joystick.get_numaxes()
         #textPrint.print(screen, "Number of axes: {}".format(axes) )
         #textPrint.indent()
-        
+        stop = 0
         for i in range( axes ):
             axis = joystick.get_axis( i )
             textPrint.print(screen, "Axis {} value: {:>6.3f}".format(i, axis) )
-            #if i==1 and (axis<-0.1 or axis>0.1):
-                #print("Left ↑ ↓",-axis)
-                #client.publish(topic="vx",payload=axis,qos=0,retain=False)
-            if i==0:
-                print("Left ← →",-axis)
-                client.publish(topic="turn",payload=axis,qos=0,retain=False)
+            if i==1 and (axis>0.1 or axis<-0.1):
+                print("Left ↑ ↓",axis)
+                client.publish(topic="vx",payload=-axis,qos=0,retain=False)
+            if i==0 and (axis>0.1 or axis<-0.1):
+                print("Left ← →",axis)
+                client.publish(topic="vy",payload=axis,qos=0,retain=False)
             if i==3 and axis < -0.1:
                 print("Right up",axis)
             if i==3 and axis > 0.1:
                 print("Right down",axis)
-            if i==2 and axis < -0.1:
-                print("Right left",axis)
-            if i==2 and axis > 0.1:
-                print("Right right",axis)
-            if i==4 :
-                axis+=1
-                print("brake",axis)
-                client.publish(topic="brake",payload=-axis*1.3,qos=0,retain=False)
-            if i==5 :
-                axis+=1
-                print("accelerator",axis)
-                client.publish(topic="accelerator",payload=-axis*1.3,qos=0,retain=False)
+            if i==2 and (axis>0.1 or axis<-0.1):
+                print("Right ← →",axis)
+                client.publish(topic="wz",payload=axis,qos=0,retain=False)
+
+            # if i==4 :
+                # axis+=1
+                # print("brake",axis)
+                # client.publish(topic="brake",payload=-axis*1.3,qos=2,retain=False)
+            # if i==5 :
+            #     axis+=1
+            #     print("accelerator",axis)
+            #     client.publish(topic="accelerator",payload=-axis*1.3,qos=2,retain=False)
        
         textPrint.unindent()
             
@@ -226,10 +226,10 @@ while done==False:
                 print("FX left")
             if hat==(0,1):
                 print("FX up")
-                client.publish(topic="gearmode",payload=-1,qos=2,retain=False)
+                #client.publish(topic="gearmode",payload=-1,qos=2,retain=False)
             if hat==(0,-1):
                 print("FX down")
-                client.publish(topic="gearmode",payload=1,qos=2,retain=False)
+                #client.publish(topic="gearmode",payload=1,qos=2,retain=False)
 
         textPrint.unindent()
         

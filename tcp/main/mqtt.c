@@ -30,9 +30,9 @@
 char control_data_receive[10];
 float  control_data;
 char car_topic[20];
-int16_t acc_message=0;
-int16_t bre_message=0;
-int16_t tur_message=0;
+int16_t vy_message=0;
+int16_t vx_message=0;
+int16_t wz_message=0;
 
 static const char *TAG = "ESP32";
 static void log_error_if_nonzero(const char *message, int error_code)
@@ -78,28 +78,36 @@ static void mqtt_event_handler(void *handler_args, esp_event_base_t base, int32_
     ESP_LOGD(TAG, "Event dispatched from event loop base=%s, event_id=%d", base, event_id);
     esp_mqtt_event_handle_t event = event_data;
     esp_mqtt_client_handle_t client = event->client;
-    int msg_id[4];
+    int msg_id[6]={0};
     switch ((esp_mqtt_event_id_t)event_id) {
     case MQTT_EVENT_CONNECTED:
         ESP_LOGI(TAG, "MQTT_EVENT_CONNECTED");
-        msg_id[0] = esp_mqtt_client_subscribe(client, "brake", 2);
-        ESP_LOGI(TAG, "sent subscribe successful, msg_id=%d", msg_id[0]);
-        msg_id[1] = esp_mqtt_client_subscribe(client, "accelerator", 2);
-        ESP_LOGI(TAG, "sent subscribe successful, msg_id=%d", msg_id[1]);
-        msg_id[2] = esp_mqtt_client_subscribe(client, "turn", 2);
+        // msg_id[0] = esp_mqtt_client_subscribe(client, "brake", 2);
+        // ESP_LOGI(TAG, "sent subscribe successful, msg_id=%d", msg_id[0]);
+        // msg_id[1] = esp_mqtt_client_subscribe(client, "accelerator", 2);
+        // ESP_LOGI(TAG, "sent subscribe successful, msg_id=%d", msg_id[1]);
+        msg_id[2] = esp_mqtt_client_subscribe(client, "vx", 2);
         ESP_LOGI(TAG, "sent subscribe successful, msg_id=%d", msg_id[2]);
+        msg_id[3] = esp_mqtt_client_subscribe(client, "vy", 2);
+        ESP_LOGI(TAG, "sent subscribe successful, msg_id=%d", msg_id[3]);
+        msg_id[4] = esp_mqtt_client_subscribe(client, "wz", 2);
+        ESP_LOGI(TAG, "sent subscribe successful, msg_id=%d", msg_id[4]);
         break;
     case MQTT_EVENT_DISCONNECTED:
         ESP_LOGI(TAG, "MQTT_EVENT_DISCONNECTED");
         break;
     case MQTT_EVENT_SUBSCRIBED:
         ESP_LOGI(TAG, "MQTT_EVENT_SUBSCRIBED, msg_id=%d", event->msg_id);
-        msg_id[0] = esp_mqtt_client_publish(client, "brake", "start0", 0, 2, 0);//左边灯开关
-        ESP_LOGI(TAG, "sent publish successful, msg_id=%d", msg_id[0]);
-        msg_id[1] = esp_mqtt_client_publish(client, "accelerator", "start1", 0, 2, 0);//右边灯开关
-        ESP_LOGI(TAG, "sent publish successful, msg_id=%d", msg_id[1]);
-        msg_id[2] = esp_mqtt_client_publish(client, "turn", "start2", 0, 2, 0);//全部的开关
+        // msg_id[0] = esp_mqtt_client_publish(client, "brake", "start0", 0, 2, 0);
+        // ESP_LOGI(TAG, "sent publish successful, msg_id=%d", msg_id[0]);
+        // msg_id[1] = esp_mqtt_client_publish(client, "accelerator", "start1", 0, 2, 0);
+        // ESP_LOGI(TAG, "sent publish successful, msg_id=%d", msg_id[1]);
+        msg_id[2] = esp_mqtt_client_publish(client, "vx", "start2", 0, 2, 0);
         ESP_LOGI(TAG, "sent publish successful, msg_id=%d", msg_id[2]);
+        msg_id[2] = esp_mqtt_client_publish(client, "vy", "start2", 0, 2, 0);
+        ESP_LOGI(TAG, "sent publish successful, msg_id=%d", msg_id[3]);
+        msg_id[2] = esp_mqtt_client_publish(client, "wz", "start2", 0, 2, 0);
+        ESP_LOGI(TAG, "sent publish successful, msg_id=%d", msg_id[4]);
         break;
     case MQTT_EVENT_UNSUBSCRIBED:
         ESP_LOGI(TAG, "MQTT_EVENT_UNSUBSCRIBED, msg_id=%d", event->msg_id);
@@ -122,17 +130,17 @@ static void mqtt_event_handler(void *handler_args, esp_event_base_t base, int32_
         control_data = atof(control_data_receive);
         printf("DATA=%s\r\n",control_data_receive);
         printf("DATA_TSM = %f\r\n",control_data);
-        if(my_strcmp(car_topic,"brake"))
+        if(my_strcmp(car_topic,"vx"))
         {
-            bre_message = control_data;
+            vx_message = control_data;
         }
-        else if(my_strcmp(car_topic,"accelerator"))
+        else if(my_strcmp(car_topic,"vy"))
         {
-           acc_message = -control_data;//刹车控制
+           vy_message = control_data;//刹车控制
         }
-        else if(my_strcmp(car_topic,"turn"))
+        else if(my_strcmp(car_topic,"wz"))
         {
-            tur_message = control_data;//转向控制
+            wz_message = control_data;//转向控制
         }
         memset(control_data_receive,'\0',sizeof(control_data_receive)); 
         memset(car_topic,'\0',sizeof(car_topic)); 

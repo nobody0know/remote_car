@@ -14,7 +14,6 @@ static const twai_filter_config_t f_config = {.acceptance_code = (0),
 static const twai_general_config_t g_config = TWAI_GENERAL_CONFIG_DEFAULT(TX_GPIO_NUM, RX_GPIO_NUM, TWAI_MODE_NO_ACK);
 
 moto_measure_t moto_chassis[MOTO_NUM];
-
 enum MOTO_ID {
     CAN_3510Moto_ALL_ID = 0x200,
 	CAN_3510Moto1_ID = 0x201,
@@ -57,10 +56,12 @@ void feedback_update_task(void* n){
             case CAN_3510Moto4_ID:{
                 uint8_t i = rx_message.identifier - CAN_3510Moto1_ID;
                 get_moto_measure(&moto_chassis[i],&rx_message);
+                car_chassis[i].wheel_rpm_get = moto_chassis[i].speed_rpm;
+                printf("can: wheel_rpm_get = %d\n",car_chassis[i].wheel_rpm_get);
             }
                 break;
         }
-        vTaskDelay(100);
+        vTaskDelay(50);
     }
 
 }
