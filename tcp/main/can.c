@@ -35,7 +35,7 @@ esp_err_t can_init(void){
     //start operation
     ESP_ERROR_CHECK(twai_start());
 
-    if(pdPASS == xTaskCreate(feedback_update_task,"moto_fb",4096,NULL,FB_UPDATE_PRIO,&fb_handle)){
+    if(pdPASS == xTaskCreatePinnedToCore(feedback_update_task,"moto_fb",4096,NULL,FB_UPDATE_PRIO,&fb_handle,1)){
         return ESP_OK;
     }
 
@@ -56,12 +56,14 @@ void feedback_update_task(void* n){
             case CAN_3510Moto4_ID:{
                 uint8_t i = rx_message.identifier - CAN_3510Moto1_ID;
                 get_moto_measure(&moto_chassis[i],&rx_message);
+                if(moto_chassis[i].speed_rpm<20&&moto_chassis[i].speed_rpm>-20)
+                moto_chassis[i].speed_rpm=0;
                 car_chassis[i].wheel_rpm_get = moto_chassis[i].speed_rpm;
-                printf("can: wheel_rpm_get = %d\n",car_chassis[i].wheel_rpm_get);
+                // printf("can: wheel_rpm_get[%d] = %d\n",i,car_chassis[i].wheel_rpm_get);
             }
                 break;
         }
-        vTaskDelay(50);
+        vTaskDelay(5);
     }
 
 }

@@ -10,18 +10,15 @@
  */
 #include "stdint.h"
 #include "esp_err.h"
-#define CAR_CONTROL_MODE 1//1为油门刹车的开环模式，0为pid控制的闭环模式
 
-#define CHASSIS_PID_P 10.0f
-#define CHASSIS_PID_I 0.5f
-#define CHASSIS_PID_D 0.5f
-#define CHASSIS_PID_MAXOUT 16000
+#define CHASSIS_PID_P 0.03f
+#define CHASSIS_PID_I 0.001f
+#define CHASSIS_PID_D 0.0f
+#define CHASSIS_PID_MAXOUT 1600
 #define CHASSIS_PID_INTERGRAL_LIMIT 1000
 #define CHASSIS_PID_DEADBAND 10
 #define CHASSIS_PID_MAX_ERR 800
 #define CHASSIS_PID_FIRST_TARGET 0
-#define ACCELERATE_RATE 2000
-#define BRAKE_RATE 100
 #define FORWARD_RATE 300
 #define BACK_RATE 300
 typedef struct

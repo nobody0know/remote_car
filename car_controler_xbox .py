@@ -39,6 +39,8 @@ class MqttRoad(object):
         client.on_publish = self.on_publish
         client.on_disconnect = self.on_disconnect
         client.on_subscribe = self.on_subscribe
+        client._username = "nobody"
+        client._password = "123456"
         client.connect_async(mqtt_host, mqtt_port, mqtt_keepalive)  # 600为keepalive的时间间隔
         client.loop_start()  # 保持连接
  
@@ -99,12 +101,12 @@ pygame.joystick.init()
 # Get ready to print
 textPrint = TextPrint()
  
-HOST = "bemfa.com"
-PORT = 9501
+HOST = "w27b7a28.cn-shenzhen.emqx.cloud"
+PORT = 11303
 topic = "test"
  
 
-client = mqtt.Client("4ea6ab40f4f64f0b80fcddf9c92453f7")
+client = mqtt.Client()
 MqttRoad(HOST, PORT, 600)
 
 # -------- Main Program Loop -----------
@@ -157,9 +159,10 @@ while done==False:
             if i==1 and (axis>0.1 or axis<-0.1):
                 print("Left ↑ ↓",axis)
                 client.publish(topic="vx",payload=-axis,qos=0,retain=False)
-            if i==0 and (axis>0.1 or axis<-0.1):
+
+            if i==0 and (axis>0.03 or axis<-0.1):
                 print("Left ← →",axis)
-                client.publish(topic="vy",payload=axis,qos=0,retain=False)
+                # client.publish(topic="vy",payload=axis,qos=0,retain=False)
             if i==3 and axis < -0.1:
                 print("Right up",axis)
             if i==3 and axis > 0.1:
@@ -248,4 +251,5 @@ while done==False:
 # Close the window and quit.
 # If you forget this line, the program will 'hang'
 # on exit if running from IDLE.
+
 pygame.quit ()

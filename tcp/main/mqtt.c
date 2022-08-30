@@ -104,9 +104,9 @@ static void mqtt_event_handler(void *handler_args, esp_event_base_t base, int32_
         // ESP_LOGI(TAG, "sent publish successful, msg_id=%d", msg_id[1]);
         msg_id[2] = esp_mqtt_client_publish(client, "vx", "start2", 0, 2, 0);
         ESP_LOGI(TAG, "sent publish successful, msg_id=%d", msg_id[2]);
-        msg_id[2] = esp_mqtt_client_publish(client, "vy", "start2", 0, 2, 0);
+        msg_id[3] = esp_mqtt_client_publish(client, "vy", "start2", 0, 2, 0);
         ESP_LOGI(TAG, "sent publish successful, msg_id=%d", msg_id[3]);
-        msg_id[2] = esp_mqtt_client_publish(client, "wz", "start2", 0, 2, 0);
+        msg_id[4] = esp_mqtt_client_publish(client, "wz", "start2", 0, 2, 0);
         ESP_LOGI(TAG, "sent publish successful, msg_id=%d", msg_id[4]);
         break;
     case MQTT_EVENT_UNSUBSCRIBED:
@@ -130,17 +130,19 @@ static void mqtt_event_handler(void *handler_args, esp_event_base_t base, int32_
         control_data = atof(control_data_receive);
         printf("DATA=%s\r\n",control_data_receive);
         printf("DATA_TSM = %f\r\n",control_data);
+        if(control_data<0.5&&control_data>-0.5)
+        control_data=0;
         if(my_strcmp(car_topic,"vx"))
         {
-            vx_message = control_data;
+            vx_message = control_data*1000;
         }
         else if(my_strcmp(car_topic,"vy"))
         {
-           vy_message = control_data;//刹车控制
+           vy_message = control_data*1000;//刹车控制
         }
         else if(my_strcmp(car_topic,"wz"))
         {
-            wz_message = control_data;//转向控制
+            wz_message = control_data*1000;//转向控制
         }
         memset(control_data_receive,'\0',sizeof(control_data_receive)); 
         memset(car_topic,'\0',sizeof(car_topic)); 
@@ -163,9 +165,10 @@ static void mqtt_event_handler(void *handler_args, esp_event_base_t base, int32_
  void mqtt_app_start(void)
 {
     esp_mqtt_client_config_t mqtt_cfg = {
-        .host = "bemfa.com",
-        .port = 9501,
-        .client_id = "4ea6ab40f4f64f0b80fcddf9c92453f7",
+        .host = "w27b7a28.cn-shenzhen.emqx.cloud",
+        .port = 11303,
+        .username = "nobody",
+        .password = "123456",
     };
 
     esp_mqtt_client_handle_t client = esp_mqtt_client_init(&mqtt_cfg);

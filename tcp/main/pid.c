@@ -51,7 +51,7 @@ inline void pid_target(PID_TypeDef *pid, uint16_t new_target)
     pid->target = new_target;
 }
 
-float pid_cal(PID_TypeDef *pid, int16_t measure, int16_t target)
+float pid_cal(PID_TypeDef *pid,float_t measure, float_t target)
 {
 
     pid->lasttime = pid->thistime;
